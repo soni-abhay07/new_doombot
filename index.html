@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DOOMBOT // Latverian Sovereign Intelligence Terminal v6.16</title>
+  <!-- Tailwind CSS via CDN (Zero Build Dependencies for Instant Vercel Deployment) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cinzel (Imperial Latverian Headers), Space Grotesk (Body), JetBrains Mono (Telemetry/Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Cinzel', 'serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            sans: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            obsidian: '#070908',
+            titanium: '#111715',
+            emeraldDoom: '#10b981',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* ==========================================================================
+       LATVERIAN SOVEREIGN THEME VARIABLES & DIRECTIVE MODE STATES
+       ========================================================================== */
+    :root {
+      --accent-primary: #00ff88;
+      --accent-secondary: #10b981;
+      --accent-trim: #c5a059; /* Imperial Latverian Gold-Bronze */
+      --accent-glow: rgba(0, 255, 136, 0.35);
+      --accent-glow-soft: rgba(0, 255, 136, 0.12);
+      --accent-border: rgba(0, 255, 136, 0.28);
+      --panel-bg: rgba(11, 16, 14, 0.88);
+    }
+
+    body[data-mode="SOVEREIGN DECREE"] {
+      --accent-primary: #00ff88;
+      --accent-secondary: #10b981;
+      --accent-trim: #d4af37;
+      --accent-glow: rgba(0, 255, 136, 0.35);
+      --accent-glow-soft: rgba(0, 255, 136, 0.12);
+      --accent-border: rgba(0, 255, 136, 0.3);
+    }
+
+    body[data-mode="INCURSION TACTICAL"] {
+      --accent-primary: #22ff99;
+      --accent-secondary: #ef4444;
+      --accent-trim: #f59e0b;
+      --accent-glow: rgba(239, 68, 68, 0.32);
+      --accent-glow-soft: rgba(0, 255, 136, 0.15);
+      --accent-border: rgba(239, 68, 68, 0.42);
+    }
+
+    body[data-mode="ARCANE & TECH FORGE"] {
+      --accent-primary: #00ffd5;
+      --accent-secondary: #00ff88;
+      --accent-trim: #38bdf8;
+      --accent-glow: rgba(0, 255, 213, 0.42);
+      --accent-glow-soft: rgba(0, 255, 213, 0.14);
+      --accent-border: rgba(0, 255, 213, 0.38);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      background-color: #070908;
+      color: #e2ece8;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      min-height: 100dvh;
+    }
+
+    /* Animated Hexagonal & Tactical Grid Overlay */
+    .hex-grid-bg {
+      background-color: #070908;
+      background-image:
+        radial-gradient(circle at 50% 0%, var(--accent-glow-soft) 0%, transparent 65%),
+        linear-gradient(to right, rgba(0, 255, 136, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 255, 136, 0.035) 1px, transparent 1px);
+      background-size: 100% 100%, 36px 36px, 36px 36px;
+      animation: gridDrift 28s linear infinite;
+    }
+
+    @keyframes gridDrift {
+      0% { background-position: 0 0, 0 0, 0 0; }
+      100% { background-position: 0 0, 36px 36px, 36px 36px; }
+    }
+
+    /* Brushed Titanium Metallic Frames */
+    .titanium-panel {
+      position: relative;
+      background:
+        radial-gradient(420px circle at var(--mouse-x, 50%) var(--mouse-y, 0%), var(--accent-glow-soft), transparent 65%),
+        linear-gradient(160deg, rgba(22, 30, 27, 0.92) 0%, rgba(9, 13, 12, 0.96) 55%, rgba(16, 23, 20, 0.92) 100%);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.75),
+        inset 0 1px 0 rgba(255, 255, 255, 0.09),
+        0 0 24px var(--accent-glow-soft);
+      backdrop-filter: blur(12px);
+      transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .titanium-accent-border {
+      border-color: var(--accent-border);
+    }
+
+    /* ==========================================================================
+       UNIVERSAL KINETIC BUTTON ANIMATIONS & TACTILE ENERGY EFFECTS
+       ========================================================================== */
+    .doom-btn {
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0) scale(1);
+      transition:
+        transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.25s ease,
+        background-color 0.25s ease,
+        box-shadow 0.28s ease,
+        color 0.25s ease;
+      will-change: transform;
+    }
+
+    /* Specular Metallic Light Sweep Across Buttons */
+    .doom-btn::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -130%;
+      width: 85%;
+      height: 100%;
+      background: linear-gradient(
+        115deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.08) 40%,
+        rgba(0, 255, 136, 0.26) 50%,
+        rgba(255, 255, 255, 0.08) 60%,
+        transparent 100%
+      );
+      transform: skewX(-22deg);
+      transition: left 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .doom-btn:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.015);
+      border-color: var(--accent-primary);
+      box-shadow: 0 6px 20px -4px var(--accent-glow), inset 0 0 10px var(--accent-glow-soft);
+    }
+
+    .doom-btn:hover:not(:disabled)::before {
+      left: 155%;
+    }
+
+    .doom-btn:active:not(:disabled) {
+      transform: translateY(1px) scale(0.955);
+      transition-duration: 0.08s;
+    }
+
+    /* Click Shockwave Ripple Element */
+    .doom-ripple {
+      position: absolute;
+      border-radius: 9999px;
+      transform: translate(-50%, -50%) scale(0);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, var(--accent-primary) 45%, transparent 72%);
+      pointer-events: none;
+      animation: doomRippleExpand 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      z-index: 2;
+    }
+
+    @keyframes doomRippleExpand {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0.85;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(3.2);
+        opacity: 0;
+      }
+    }
+
+    /* Hero TRANSMIT Send Button Reactor & Launch Animations */
+    .transmit-btn {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #059669 0%, #10b981 48%, #34d399 100%);
+      background-size: 200% 200%;
+      animation: transmitIdleFlow 4s ease infinite;
+      box-shadow:
+        0 0 18px rgba(0, 255, 136, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      transition:
+        transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.3s ease,
+        filter 0.3s ease;
+    }
+
+    @keyframes transmitIdleFlow {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* Charged Reactor State when user types text */
+    .transmit-btn.transmit-charged {
+      animation: transmitChargedPulse 1.4s ease-in-out infinite alternate, transmitIdleFlow 2.2s ease infinite;
+      box-shadow:
+        0 0 28px rgba(0, 255, 136, 0.62),
+        0 0 48px rgba(0, 255, 136, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    @keyframes transmitChargedPulse {
+      0% { filter: brightness(1); }
+      100% { filter: brightness(1.16); }
+    }
+
+    .transmit-btn:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow:
+        0 0 32px rgba(0, 255, 136, 0.7),
+        0 8px 24px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    }
+
+    .transmit-btn:hover:not(:disabled) .transmit-icon {
+      transform: translate(3px, -3px) rotate(-6deg) scale(1.12);
+    }
+
+    .transmit-btn:active:not(:disabled) {
+      transform: translateY(1px) scale(0.94);
+    }
+
+    .transmit-icon {
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* High-velocity vector launch animation upon message submit */
+    .transmit-btn.is-launching .transmit-icon {
+      animation: vectorLaunch 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes vectorLaunch {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      45% { transform: translate(22px, -22px) scale(0.6); opacity: 0; }
+      55% { transform: translate(-18px, 18px) scale(0.6); opacity: 0; }
+      100% { transform: translate(0, 0) scale(1); opacity: 1; }
+    }
+
+    /* Vocal Equalizer Bars */
+    .eq-bars {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 12px;
+    }
+    .eq-bars span {
+      display: block;
+      width: 2.5px;
+      height: 3px;
+      border-radius: 9999px;
+      background-color: currentColor;
+      transition: height 0.2s ease;
+    }
+    .eq-bars.eq-active span {
+      animation: eqDance 0.75s ease-in-out infinite alternate;
+    }
+    .eq-bars.eq-active span:nth-child(2) { animation-delay: 0.18s; }
+    .eq-bars.eq-active span:nth-child(3) { animation-delay: 0.36s; }
+    .eq-bars.eq-active span:nth-child(4) { animation-delay: 0.12s; }
+
+    @keyframes eqDance {
+      0% { height: 3px; }
+      100% { height: 12px; }
+    }
+
+    /* Interactive Telemetry Card Hover & Click Pulse */
+    .telemetry-card {
+      cursor: pointer;
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .telemetry-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-primary);
+      background-color: rgba(10, 22, 18, 0.78);
+      box-shadow: 0 6px 18px -6px var(--accent-glow);
+    }
+    .telemetry-card:active {
+      transform: scale(0.97);
+    }
+
+    /* Interactive Doctor Doom Emblem */
+    #doomEmblemWrapper {
+      cursor: pointer;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    #doomEmblemWrapper:hover {
+      transform: scale(1.06) rotate(-1.5deg);
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+    #doomEmblemWrapper:active {
+      transform: scale(0.94);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(6, 9, 8, 0.8);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(16, 185, 129, 0.3);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-primary);
+    }
+
+    /* Doctor Doom SVG Emblem Animations */
+    .doom-eye {
+      fill: var(--accent-primary);
+      filter: drop-shadow(0 0 6px var(--accent-primary));
+      transition: all 0.3s ease;
+    }
+
+    .doom-emblem-active .doom-eye {
+      animation: eyePulse 0.95s ease-in-out infinite alternate;
+    }
+
+    .doom-emblem-active .doom-hood-ring {
+      stroke: var(--accent-primary);
+      animation: ringPulse 1.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes eyePulse {
+      0% {
+        opacity: 0.75;
+        filter: drop-shadow(0 0 4px var(--accent-primary));
+      }
+      100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 14px var(--accent-primary)) drop-shadow(0 0 22px #ffffff);
+      }
+    }
+
+    @keyframes ringPulse {
+      0% { stroke-opacity: 0.35; }
+      100% { stroke-opacity: 0.95; }
+    }
+
+    /* Message Entry Animation */
+    @keyframes messageReveal {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.99);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .msg-animate {
+      animation: messageReveal 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Diagnostic Biometric Scan Laser Animation */
+    @keyframes scanSweep {
+      0% { top: 4%; opacity: 0.2; }
+      15% { opacity: 1; }
+      50% { top: 92%; opacity: 1; }
+      85% { opacity: 1; }
+      100% { top: 4%; opacity: 0.2; }
+    }
+
+    .scan-laser {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent-primary) 50%, transparent 100%);
+      box-shadow: 0 0 18px 4px var(--accent-primary);
+      animation: scanSweep 1.3s ease-in-out infinite;
+    }
+
+    /* Mode Pill Glow */
+    .mode-btn-active {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.18), rgba(16, 185, 129, 0.06));
+      border-color: var(--accent-primary) !important;
+      color: #ffffff;
+      box-shadow: 0 0 16px var(--accent-glow-soft), inset 0 0 10px var(--accent-glow-soft);
+    }
+    .mode-btn-active .mode-glyph {
+      display: inline-block;
+      color: var(--accent-primary);
+      animation: glyphSpinPulse 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes glyphSpinPulse {
+      0% { transform: scale(0.6) rotate(-90deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    /* Markdown Rich Text Styling inside DOOMBOT replies */
+    .doom-prose strong {
+      color: var(--accent-primary);
+      font-weight: 600;
+    }
+    .doom-prose code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid rgba(0, 255, 136, 0.25);
+      color: #6ee7b7;
+      padding: 0.1rem 0.38rem;
+      border-radius: 0.375rem;
+      font-size: 0.85em;
+    }
+    .doom-prose ul {
+      list-style-type: none;
+      padding-left: 0.25rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .doom-prose li {
+      position: relative;
+      padding-left: 1.15rem;
+      margin-bottom: 0.35rem;
+    }
+    .doom-prose li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: var(--accent-primary);
+    }
+  </style>
+</head>
+<body data-mode="SOVEREIGN DECREE" class="hex-grid-bg font-sans antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Ambient Hex Lattice Background Canvas -->
+  <canvas id="hexCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-55"></canvas>
+
+  <!-- Main Application Shell -->
+  <div class="relative z-10 flex flex-col min-h-dvh max-w-6xl mx-auto px-2.5 sm:px-5 py-2.5 sm:py-4 gap-2.5 sm:gap-3.5">
+
+    <!-- ======================================================================
+         HEADER: LATVERIAN SOVEREIGN TERMINAL IDENTITY & SYSTEM CONTROLS
+         ====================================================================== -->
+    <header class="titanium-panel titanium-accent-border rounded-2xl px-3.5 sm:px-6 py-3 flex flex-col lg:flex-row items-center justify-between gap-3">
+      <!-- Brand + Custom Geometric Doctor Doom Mask SVG -->
+      <div class="flex items-center gap-3.5 w-full lg:w-auto justify-between lg:justify-start">
+        <div class="flex items-center gap-3.5">
+          <!-- Custom Geometric SVG Emblem of Doctor Doom -->
+          <div id="doomEmblemWrapper" role="button" tabindex="0" title="Activate Latverian Sovereign Ping" class="relative flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-b from-[#17211e] to-[#080c0a] border border-emerald-500/40 flex items-center justify-center shadow-lg">
+            <svg viewBox="0 0 100 100" class="w-10 h-10 sm:w-11 sm:h-11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Doctor Doom Sovereign Emblem">
+              <defs>
+                <linearGradient id="titaniumGrad" x1="15" y1="10" x2="85" y2="90" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#94a3b8" />
+                  <stop offset="45%" stop-color="#475569" />
+                  <stop offset="100%" stop-color="#1e293b" />
+                </linearGradient>
+                <linearGradient id="hoodGrad" x1="50" y1="4" x2="50" y2="96" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#065f46" />
+                  <stop offset="65%" stop-color="#022c22" />
+                  <stop offset="100%" stop-color="#04130f" />
+                </linearGradient>
+              </defs>
+              <!-- Outer Hexagonal Energy Frame -->
+              <polygon class="doom-hood-ring" points="50,3 92,26 92,74 50,97 8,74 8,26" stroke="#10b981" stroke-width="2" stroke-opacity="0.45" />
+              <!-- Latverian Emerald Cowl / Hood -->
+              <path d="M50 10 L82 28 L85 68 L68 88 L32 88 L15 68 L18 28 Z" fill="url(#hoodGrad)" stroke="#059669" stroke-width="1.5" />
+              <!-- Inner Hood Shadow Fold -->
+              <path d="M50 16 L74 31 L75 64 L63 82 L37 82 L25 64 L26 31 Z" fill="#050a08" />
+              <!-- Forged Titanium Faceplate -->
+              <polygon points="50,21 70,33 68,63 58,80 42,80 32,63 30,33" fill="url(#titaniumGrad)" stroke="#cbd5e1" stroke-width="1.1" />
+              <!-- Angular Brow Ridge -->
+              <path d="M31 39 L50 45 L69 39 L67 44 L50 49 L33 44 Z" fill="#1e293b" />
+              <!-- Glowing Emerald Eyes (Pointer-Tracking Enabled) -->
+              <g id="doomEyesGroup" style="transition: transform 0.12s ease-out;">
+                <polygon class="doom-eye" points="35,44 47,47 45,51 36,48" />
+                <polygon class="doom-eye" points="65,44 53,47 55,51 64,48" />
+              </g>
+              <!-- Nasal Bridge & Cheek Facets -->
+              <line x1="50" y1="45" x2="50" y2="62" stroke="#1e293b" stroke-width="1.8" />
+              <path d="M32 54 L42 62 L39 76" stroke="#334155" stroke-width="1.2" />
+              <path d="M68 54 L58 62 L61 76" stroke="#334155" stroke-width="1.2" />
+              <!-- Stern Metallic Mouth Grille -->
+              <rect x="41" y="64" width="18" height="11" rx="1.5" fill="#0f172a" stroke="#64748b" stroke-width="1" />
+              <line x1="45" y1="64" x2="45" y2="75" stroke="#94a3b8" stroke-width="1.1" />
+              <line x1="50" y1="64" x2="50" y2="75" stroke="#94a3b8" stroke-width="1.1" />
+              <line x1="55" y1="64" x2="55" y2="75" stroke="#94a3b8" stroke-width="1.1" />
+              <!-- Armor Rivets -->
+              <circle cx="35" cy="34" r="1.2" fill="#e2e8f0" />
+              <circle cx="65" cy="34" r="1.2" fill="#e2e8f0" />
+              <circle cx="36" cy="61" r="1.2" fill="#e2e8f0" />
+              <circle cx="64" cy="61" r="1.2" fill="#e2e8f0" />
+            </svg>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="font-display text-xl sm:text-2xl font-extrabold tracking-wider text-white">
+                DOOMBOT
+              </h1>
+              <span class="font-mono text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/35 text-emerald-300 tracking-widest">
+                v6.16 // SOVEREIGN AI
+              </span>
+            </div>
+            <p class="font-mono text-[11px] sm:text-xs text-slate-400 tracking-wide mt-0.5">
+              LATVERIAN SOVEREIGN INTELLIGENCE TERMINAL • CASTLE DOOMSTADT
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terminal Action Controls: Brevity Lock, Voice Output, Neural Key Config, Reset Terminal -->
+      <div class="flex items-center flex-wrap justify-center sm:justify-end gap-2 w-full lg:w-auto">
+        <!-- Directive Brevity Toggle (Locked to STRICT by default) -->
+        <button
+          id="brevityToggleBtn"
+          type="button"
+          class="doom-btn font-mono text-[11px] sm:text-xs px-3 py-2 rounded-xl bg-emerald-950/55 hover:bg-emerald-900/65 border border-emerald-400/60 text-emerald-300 flex items-center gap-2 cursor-pointer"
+          title="Toggle between STRICT direct-answer mode and EXPANDED tactical detail"
+        >
+          <span id="brevityLed" class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#00ff88] transition-transform duration-300"></span>
+          <span id="brevityToggleLabel">DIRECTIVE BREVITY: STRICT</span>
+        </button>
+
+        <!-- Vocal Synthesis Toggle -->
+        <button
+          id="voiceToggleBtn"
+          type="button"
+          class="doom-btn font-mono text-[11px] sm:text-xs px-3 py-2 rounded-xl bg-black/50 hover:bg-emerald-950/50 border border-slate-700/80 hover:border-emerald-500/50 text-slate-300 flex items-center gap-2 cursor-pointer"
+          title="Toggle Web Speech API Voice Output"
+        >
+          <svg id="voiceIcon" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+          <span id="voiceToggleLabel">VOCAL SYNTHESIS: OFF</span>
+          <span id="voiceEqBars" class="eq-bars text-emerald-400 hidden" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </span>
+        </button>
+
+        <!-- Optional API Key Configuration (For Standalone Vercel Deployments) -->
+        <button
+          id="openKeyModalBtn"
+          type="button"
+          class="doom-btn group font-mono text-[11px] sm:text-xs px-3 py-2 rounded-xl bg-black/50 hover:bg-emerald-950/50 border border-slate-700/80 hover:border-emerald-500/50 text-slate-300 flex items-center gap-1.5 cursor-pointer"
+          title="Configure Custom Gemini API Key for Vercel Deployment"
+        >
+          <svg class="w-3.5 h-3.5 text-emerald-400 transition-transform duration-300 group-hover:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+          </svg>
+          <span class="hidden sm:inline">NEURAL KEY</span>
+        </button>
+
+        <!-- Clear Chat / Reset Terminal -->
+        <button
+          id="resetTerminalBtn"
+          type="button"
+          class="doom-btn group font-mono text-[11px] sm:text-xs px-3 py-2 rounded-xl bg-black/50 hover:bg-red-950/40 border border-slate-700/80 hover:border-red-500/50 text-slate-300 hover:text-red-300 flex items-center gap-1.5 cursor-pointer"
+          title="Purge Session Memory & Reset Terminal"
+        >
+          <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>RESET TERMINAL</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ======================================================================
+         LIVE MULTIVERSE INCURSION TELEMETRY BAR & DOOMSDAY COUNTDOWN
+         ====================================================================== -->
+    <section aria-label="Multiverse Incursion Telemetry" class="titanium-panel rounded-2xl px-3.5 sm:px-5 py-2.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+      <!-- Earth-616 (Interactive Reality Probe) -->
+      <div data-reality-prompt="Earth-616 Tactical Status" title="Click to probe Earth-616 telemetry" class="telemetry-card doom-btn bg-black/45 border border-emerald-500/20 rounded-xl px-3 py-2 flex flex-col justify-between">
+        <div class="flex items-center justify-between font-mono text-[10px] text-slate-400">
+          <span class="font-semibold text-emerald-300 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+            EARTH-616
+          </span>
+          <span id="e616Status" class="text-amber-400">64.2% • FRACTURING</span>
+        </div>
+        <div class="text-[11px] text-slate-400 truncate mt-0.5">Avengers / Wakanda / New Avengers</div>
+        <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden mt-1.5">
+          <div id="e616Bar" class="h-full bg-gradient-to-r from-emerald-500 to-amber-400 transition-all duration-1000" style="width: 64.2%"></div>
+        </div>
+      </div>
+
+      <!-- Earth-828 (Interactive Reality Probe) -->
+      <div data-reality-prompt="Earth-828 Fantastic Four & Baxter Nexus Status" title="Click to probe Earth-828 telemetry" class="telemetry-card doom-btn bg-black/45 border border-emerald-500/20 rounded-xl px-3 py-2 flex flex-col justify-between">
+        <div class="flex items-center justify-between font-mono text-[10px] text-slate-400">
+          <span class="font-semibold text-cyan-300 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping"></span>
+            EARTH-828
+          </span>
+          <span id="e828Status" class="text-red-400">41.8% • CRITICAL</span>
+        </div>
+        <div class="text-[11px] text-slate-400 truncate mt-0.5">Fantastic Four // Baxter Nexus</div>
+        <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden mt-1.5">
+          <div id="e828Bar" class="h-full bg-gradient-to-r from-red-500 to-amber-500 transition-all duration-1000" style="width: 41.8%"></div>
+        </div>
+      </div>
+
+      <!-- Earth-10005 (Interactive Reality Probe) -->
+      <div data-reality-prompt="Earth-10005 X-Men Timeline Status" title="Click to probe Earth-10005 telemetry" class="telemetry-card doom-btn bg-black/45 border border-emerald-500/20 rounded-xl px-3 py-2 flex flex-col justify-between">
+        <div class="flex items-center justify-between font-mono text-[10px] text-slate-400">
+          <span class="font-semibold text-emerald-300 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            EARTH-10005
+          </span>
+          <span id="e10005Status" class="text-emerald-400">53.9% • CONVERGING</span>
+        </div>
+        <div class="text-[11px] text-slate-400 truncate mt-0.5">X-Men // Mutant Timeline</div>
+        <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden mt-1.5">
+          <div id="e10005Bar" class="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-all duration-1000" style="width: 53.9%"></div>
+        </div>
+      </div>
+
+      <!-- Doomsday Convergence Countdown (December 18, 2026) -->
+      <div data-reality-prompt="Doomsday Convergence Timeline Verdict" title="Click for Doomsday Convergence Verdict" class="telemetry-card doom-btn bg-gradient-to-r from-emerald-950/60 to-black/70 border border-emerald-400/35 rounded-xl px-3 py-2 flex flex-col justify-between">
+        <div class="flex items-center justify-between font-mono text-[10px]">
+          <span class="text-emerald-300 font-semibold tracking-wider">DOOMSDAY ARRIVAL</span>
+          <span class="text-slate-400">DEC 18, 2026</span>
+        </div>
+        <div id="doomsdayCountdown" class="font-mono text-sm sm:text-base font-bold text-white tracking-wider mt-0.5">
+          --d : --h : --m : --s
+        </div>
+        <div class="font-mono text-[10px] text-emerald-400/80 truncate">
+          CLICK TELEMETRY FOR INSTANT PROBE
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         DIRECTIVE MODE SWITCHER BAR
+         ====================================================================== -->
+    <div class="titanium-panel rounded-2xl p-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+      <div class="font-mono text-[11px] text-slate-400 px-2 flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#00ff88] animate-pulse"></span>
+        <span>DIRECTIVE PROTOCOL:</span>
+      </div>
+
+      <div id="modeSwitcher" class="grid grid-cols-1 sm:grid-cols-3 gap-1.5 flex-1">
+        <button
+          type="button"
+          data-directive="SOVEREIGN DECREE"
+          class="mode-btn doom-btn mode-btn-active font-mono text-xs py-2 px-3 rounded-xl border border-slate-700/70 bg-black/40 text-slate-300 hover:text-white cursor-pointer flex items-center justify-center gap-2"
+        >
+          <span class="mode-glyph">♛</span>
+          <span>SOVEREIGN DECREE</span>
+        </button>
+
+        <button
+          type="button"
+          data-directive="INCURSION TACTICAL"
+          class="mode-btn doom-btn font-mono text-xs py-2 px-3 rounded-xl border border-slate-700/70 bg-black/40 text-slate-300 hover:text-white cursor-pointer flex items-center justify-center gap-2"
+        >
+          <span class="mode-glyph">⌖</span>
+          <span>INCURSION TACTICAL</span>
+        </button>
+
+        <button
+          type="button"
+          data-directive="ARCANE & TECH FORGE"
+          class="mode-btn doom-btn font-mono text-xs py-2 px-3 rounded-xl border border-slate-700/70 bg-black/40 text-slate-300 hover:text-white cursor-pointer flex items-center justify-center gap-2"
+        >
+          <span class="mode-glyph">❖</span>
+          <span>ARCANE & TECH FORGE</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         MAIN CHAT VIEWPORT + DIAGNOSTIC SCAN OVERLAY
+         ====================================================================== -->
+    <main class="relative titanium-panel titanium-accent-border rounded-2xl flex-1 flex flex-col overflow-hidden min-h-[380px] sm:min-h-[440px]">
+
+      <!-- Interactive Diagnostic Biometric & Chronal Scan Overlay (Triggered on Survival Scan) -->
+      <div id="diagnosticScanOverlay" class="hidden absolute inset-0 z-30 bg-[#040807]/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+        <div class="scan-laser"></div>
+
+        <!-- Reticle SVG -->
+        <div class="relative w-36 h-36 sm:w-44 sm:h-44 mb-4 flex items-center justify-center">
+          <svg class="w-full h-full animate-spin" style="animation-duration: 9s;" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="54" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="10 6" stroke-opacity="0.65" />
+            <circle cx="60" cy="60" r="42" stroke="#10b981" stroke-width="1" stroke-dasharray="4 4" stroke-opacity="0.45" />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="font-mono text-[10px] text-emerald-400 tracking-widest">SUBJECT SCAN</span>
+            <span id="scanPercentDisplay" class="font-mono text-2xl sm:text-3xl font-bold text-white mt-0.5">0%</span>
+          </div>
+        </div>
+
+        <div class="font-display text-base sm:text-lg font-bold tracking-widest text-emerald-300 uppercase">
+          LATVERIAN CHRONAL & BIOMETRIC AUDIT
+        </div>
+        <p id="scanTelemetryText" class="font-mono text-xs text-slate-300 mt-2 max-w-md">
+          INITIALIZING MULTIVERSAL ANCHOR VERIFICATION...
+        </p>
+
+        <div class="mt-4 grid grid-cols-3 gap-2 w-full max-w-md font-mono text-[10px]">
+          <div class="bg-black/60 border border-emerald-500/30 rounded-lg p-2">
+            <div class="text-slate-400">ORIGIN</div>
+            <div id="scanOriginVal" class="text-emerald-300 font-semibold mt-0.5">EARTH-616?</div>
+          </div>
+          <div class="bg-black/60 border border-emerald-500/30 rounded-lg p-2">
+            <div class="text-slate-400">THREAT INDEX</div>
+            <div id="scanThreatVal" class="text-amber-300 font-semibold mt-0.5">EVALUATING</div>
+          </div>
+          <div class="bg-black/60 border border-emerald-500/30 rounded-lg p-2">
+            <div class="text-slate-400">SURVIVAL ODDS</div>
+            <div id="scanOddsVal" class="text-red-400 font-semibold mt-0.5">COMPUTING</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrollable Chat Messages Container -->
+      <div id="chatMessages" class="flex-1 overflow-y-auto p-3.5 sm:p-6 space-y-4">
+        <!-- Initial Sovereign Welcome Message injected via JS -->
+      </div>
+
+      <!-- Typing / Neural Channeling Indicator -->
+      <div id="typingIndicator" class="hidden px-4 sm:px-6 py-2.5 border-t border-emerald-500/20 bg-black/50 flex items-center gap-3">
+        <div class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style="animation-delay: 0ms;"></span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style="animation-delay: 150ms;"></span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style="animation-delay: 300ms;"></span>
+        </div>
+        <span class="font-mono text-xs tracking-wider text-emerald-300 animate-pulse">
+          CHANNELING LATVERIAN NEURAL MATRIX...
+        </span>
+      </div>
+
+      <!-- Tactical Quick-Action Prompts + Input Console -->
+      <div class="relative border-t border-slate-800/90 bg-[#070b0a]/95 p-3 sm:p-4 space-y-2.5">
+        <!-- Kinetic Reactor Charge Line (Scales dynamically as you type) -->
+        <div class="absolute top-0 left-0 right-0 h-[2px] bg-slate-900 overflow-hidden">
+          <div id="inputChargeBar" class="h-full w-0 bg-gradient-to-r from-emerald-500 via-emerald-300 to-cyan-300 shadow-[0_0_12px_#00ff88] transition-all duration-200"></div>
+        </div>
+
+        <!-- Quick-Action Prompt Chips -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <button
+            type="button"
+            data-prompt="Incursion Status"
+            class="quick-prompt-chip doom-btn group flex-shrink-0 font-mono text-[11px] px-3 py-1.5 rounded-full bg-emerald-950/45 hover:bg-emerald-900/60 border border-emerald-500/35 hover:border-emerald-400 text-emerald-200 cursor-pointer flex items-center gap-1.5"
+          >
+            <span class="inline-block transition-transform duration-300 group-hover:rotate-90 text-emerald-400">❖</span>
+            <span>Incursion Status</span>
+          </button>
+
+          <button
+            type="button"
+            data-prompt="Avengers Threat Assessment"
+            class="quick-prompt-chip doom-btn group flex-shrink-0 font-mono text-[11px] px-3 py-1.5 rounded-full bg-emerald-950/45 hover:bg-emerald-900/60 border border-emerald-500/35 hover:border-emerald-400 text-emerald-200 cursor-pointer flex items-center gap-1.5"
+          >
+            <span class="inline-block transition-transform duration-300 group-hover:scale-125 text-emerald-400">⚡</span>
+            <span>Avengers Threat Assessment</span>
+          </button>
+
+          <button
+            type="button"
+            data-prompt="Fantastic Four Analysis"
+            class="quick-prompt-chip doom-btn group flex-shrink-0 font-mono text-[11px] px-3 py-1.5 rounded-full bg-emerald-950/45 hover:bg-emerald-900/60 border border-emerald-500/35 hover:border-emerald-400 text-emerald-200 cursor-pointer flex items-center gap-1.5"
+          >
+            <span class="inline-block transition-transform duration-300 group-hover:rotate-45 text-cyan-400">◈</span>
+            <span>Fantastic Four Analysis</span>
+          </button>
+
+          <button
+            type="button"
+            id="scanSurvivalChip"
+            data-prompt="Survival Probability"
+            class="quick-prompt-chip doom-btn group flex-shrink-0 font-mono text-[11px] px-3 py-1.5 rounded-full bg-amber-950/40 hover:bg-amber-900/55 border border-amber-500/40 hover:border-amber-400 text-amber-200 cursor-pointer flex items-center gap-1.5"
+          >
+            <span class="inline-block transition-transform duration-300 group-hover:rotate-90 text-amber-400">⌖</span>
+            <span>Survival Probability</span>
+          </button>
+        </div>
+
+        <!-- Chat Input Form -->
+        <form id="chatForm" class="flex items-end gap-2 sm:gap-3">
+          <div class="relative flex-1">
+            <textarea
+              id="userInput"
+              rows="1"
+              placeholder="Address the Sovereign Intelligence of Latveria, mortal..."
+              class="w-full resize-none rounded-xl bg-black/70 border border-slate-700/90 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/50 text-sm sm:text-base text-slate-100 placeholder-slate-500 px-3.5 py-2.5 pr-12 outline-none transition max-h-32"
+            ></textarea>
+            <button
+              id="clearInputBtn"
+              type="button"
+              title="Clear Input"
+              class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 font-mono text-xs text-slate-500 hover:text-emerald-300 px-1.5 py-0.5 rounded transition cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+
+          <button
+            id="sendBtn"
+            type="submit"
+            class="doom-btn transmit-btn font-mono text-xs sm:text-sm font-bold tracking-wider px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl border border-emerald-300/60 text-black flex items-center gap-2 cursor-pointer flex-shrink-0"
+          >
+            <span>TRANSMIT</span>
+            <svg class="transmit-icon w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <!-- Footer Status -->
+    <footer class="flex flex-col sm:flex-row items-center justify-between gap-1 px-2 font-mono text-[10px] text-slate-500">
+      <span>ALL REALITIES SHALL KNEEL BEFORE DOOM // LATVERIAN ENCRYPTION ACTIVE</span>
+      <span id="connectionStatusLabel" class="text-emerald-500/80">NEURAL LINK: READY (GEMINI-3-FLASH)</span>
+    </footer>
+  </div>
+
+  <!-- ========================================================================
+       CUSTOM LATVERIAN TOAST NOTIFICATION (Replaces browser alert/confirm)
+       ======================================================================== -->
+  <div id="latverianToast" class="fixed bottom-5 right-5 z-50 hidden max-w-sm titanium-panel border-emerald-400/50 rounded-xl px-4 py-3 shadow-2xl">
+    <div class="flex items-center gap-2.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+      <p id="latverianToastText" class="font-mono text-xs text-emerald-200"></p>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       NEURAL KEY VAULT MODAL (For Standalone Vercel Deployment API Key)
+       ======================================================================== -->
+  <div id="keyModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="titanium-panel titanium-accent-border rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="font-display text-lg font-bold text-white tracking-wider">
+          LATVERIAN NEURAL KEY VAULT
+        </h2>
+        <button id="closeKeyModalBtn" type="button" class="text-slate-400 hover:text-white font-mono text-sm px-2 py-1 cursor-pointer">
+          ✕
+        </button>
+      </div>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        When deployed standalone on <strong>Vercel</strong>, supply your Google Gemini API key below to authorize direct neural link transmissions. Inside integrated Canvas previews, leave blank to use runtime credentials.
+      </p>
+      <div class="space-y-1.5">
+        <label for="customApiKeyInput" class="block font-mono text-[11px] text-emerald-300">
+          GEMINI API KEY (STORED LOCALLY IN BROWSER)
+        </label>
+        <input
+          id="customApiKeyInput"
+          type="password"
+          placeholder="AIzaSy..."
+          class="w-full rounded-xl bg-black/75 border border-slate-700 focus:border-emerald-400 text-xs font-mono text-white px-3.5 py-2.5 outline-none"
+        />
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button
+          id="clearKeyBtn"
+          type="button"
+          class="doom-btn font-mono text-xs px-3 py-2 rounded-xl border border-slate-700 text-slate-300 hover:text-red-300 hover:border-red-500/50 cursor-pointer"
+        >
+          PURGE KEY
+        </button>
+        <button
+          id="saveKeyBtn"
+          type="button"
+          class="doom-btn transmit-btn font-mono text-xs font-semibold px-4 py-2 rounded-xl border border-emerald-300/50 text-black cursor-pointer"
+        >
+          AUTHORIZE LINK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       APPLICATION LOGIC: GEMINI API, SCANNER, VOICE SYNTHESIS & TELEMETRY
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      // Default empty string so Canvas runtime automatically provides credentials;
+      // Optional localStorage override supports direct static deployment on Vercel.
+      const apiKey = "";
+      const STORAGE_KEY_API = 'doombot_custom_gemini_key';
+
+      // Application State
+      let currentDirective = 'SOVEREIGN DECREE';
+      let brevityMode = 'STRICT';
+      let isProcessing = false;
+      let voiceEnabled = false;
+      let conversationHistory = [];
+      let audioCtx = null;
+
+      // DOM References
+      const bodyEl = document.body;
+      const chatMessagesEl = document.getElementById('chatMessages');
+      const chatFormEl = document.getElementById('chatForm');
+      const userInputEl = document.getElementById('userInput');
+      const sendBtnEl = document.getElementById('sendBtn');
+      const typingIndicatorEl = document.getElementById('typingIndicator');
+      const doomEmblemWrapperEl = document.getElementById('doomEmblemWrapper');
+      const brevityToggleBtnEl = document.getElementById('brevityToggleBtn');
+      const brevityToggleLabelEl = document.getElementById('brevityToggleLabel');
+      const voiceToggleBtnEl = document.getElementById('voiceToggleBtn');
+      const voiceToggleLabelEl = document.getElementById('voiceToggleLabel');
+      const voiceIconEl = document.getElementById('voiceIcon');
+      const voiceEqBarsEl = document.getElementById('voiceEqBars');
+      const inputChargeBarEl = document.getElementById('inputChargeBar');
+      const clearInputBtnEl = document.getElementById('clearInputBtn');
+      const doomEyesGroupEl = document.getElementById('doomEyesGroup');
+      const resetTerminalBtnEl = document.getElementById('resetTerminalBtn');
+      const diagnosticScanOverlayEl = document.getElementById('diagnosticScanOverlay');
+      const scanPercentDisplayEl = document.getElementById('scanPercentDisplay');
+      const scanTelemetryTextEl = document.getElementById('scanTelemetryText');
+      const scanOriginValEl = document.getElementById('scanOriginVal');
+      const scanThreatValEl = document.getElementById('scanThreatVal');
+      const scanOddsValEl = document.getElementById('scanOddsVal');
+      const toastEl = document.getElementById('latverianToast');
+      const toastTextEl = document.getElementById('latverianToastText');
+
+      // Key Vault Modal DOM
+      const keyModalEl = document.getElementById('keyModal');
+      const openKeyModalBtnEl = document.getElementById('openKeyModalBtn');
+      const closeKeyModalBtnEl = document.getElementById('closeKeyModalBtn');
+      const customApiKeyInputEl = document.getElementById('customApiKeyInput');
+      const saveKeyBtnEl = document.getElementById('saveKeyBtn');
+      const clearKeyBtnEl = document.getElementById('clearKeyBtn');
+      const connectionStatusLabelEl = document.getElementById('connectionStatusLabel');
+
+      // ======================================================================
+      // 1. LATVERIAN TOAST & CLIPBOARD UTILITIES
+      // ======================================================================
+      let toastTimeout = null;
+      function showToast(message) {
+        if (!toastEl || !toastTextEl) return;
+        toastTextEl.textContent = message;
+        toastEl.classList.remove('hidden');
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toastEl.classList.add('hidden');
+        }, 2800);
+      }
+
+      function copyToClipboard(text) {
+        try {
+          const tempInput = document.createElement('textarea');
+          tempInput.value = text;
+          tempInput.style.position = 'fixed';
+          tempInput.style.opacity = '0';
+          document.body.appendChild(tempInput);
+          tempInput.select();
+          document.execCommand('copy');
+          document.body.removeChild(tempInput);
+          showToast('SOVEREIGN DECREE COPIED TO CLIPBOARD');
+        } catch (err) {
+          showToast('CLIPBOARD ACCESS RESTRICTED BY HOST');
+        }
+      }
+
+      // ======================================================================
+      // 2. WEB AUDIO API TACTICAL SYNTHESIZER
+      // ======================================================================
+      function playSynthTone(freq = 220, duration = 0.12, type = 'sine', volume = 0.03) {
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) return;
+          if (!audioCtx) {
+            audioCtx = new AudioContextClass();
+          }
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+
+          const osc = audioCtx.createOscillator();
+          const gainNode = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+          gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+          osc.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (err) {
+          // Audio playback silently ignored if blocked by browser autoplay policy
+        }
+      }
+
+      // ======================================================================
+      // 3. WEB SPEECH API VOCAL SYNTHESIS
+      // ======================================================================
+      function speakDoomResponse(rawText) {
+        if (!voiceEnabled || !('speechSynthesis' in window)) return;
+        try {
+          window.speechSynthesis.cancel();
+          const cleanText = rawText.replace(/[*`#>_]/g, '').trim();
+          const utterance = new SpeechSynthesisUtterance(cleanText);
+          const voices = window.speechSynthesis.getVoices();
+          const preferredVoice =
+            voices.find((v) => /uk english male|daniel|alex|google uk english male|david/i.test(v.name)) ||
+            voices.find((v) => v.lang && v.lang.startsWith('en'));
+
+          if (preferredVoice) utterance.voice = preferredVoice;
+          utterance.pitch = 0.72;
+          utterance.rate = 0.96;
+
+          utterance.onstart = () => {
+            doomEmblemWrapperEl.classList.add('doom-emblem-active');
+            if (voiceEqBarsEl) voiceEqBarsEl.classList.add('eq-active');
+          };
+          utterance.onend = () => {
+            if (!isProcessing) doomEmblemWrapperEl.classList.remove('doom-emblem-active');
+            if (voiceEqBarsEl) voiceEqBarsEl.classList.remove('eq-active');
+          };
+          utterance.onerror = () => {
+            if (!isProcessing) doomEmblemWrapperEl.classList.remove('doom-emblem-active');
+            if (voiceEqBarsEl) voiceEqBarsEl.classList.remove('eq-active');
+          };
+
+          window.speechSynthesis.speak(utterance);
+        } catch (err) {
+          // Ignore speech synthesis errors on unsupported environments
+        }
+      }
+
+      voiceToggleBtnEl.addEventListener('click', () => {
+        voiceEnabled = !voiceEnabled;
+        voiceToggleLabelEl.textContent = `VOCAL SYNTHESIS: ${voiceEnabled ? 'ON' : 'OFF'}`;
+
+        if (voiceEnabled) {
+          voiceToggleBtnEl.classList.add('border-emerald-400/60', 'text-emerald-300', 'bg-emerald-950/45');
+          voiceIconEl.innerHTML =
+            '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>';
+          voiceIconEl.classList.replace('text-slate-400', 'text-emerald-400');
+          if (voiceEqBarsEl) voiceEqBarsEl.classList.remove('hidden');
+          playSynthTone(260, 0.12, 'sine', 0.035);
+          showToast('VOCAL SYNTHESIS MODULE: ONLINE');
+        } else {
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          doomEmblemWrapperEl.classList.remove('doom-emblem-active');
+          if (voiceEqBarsEl) {
+            voiceEqBarsEl.classList.remove('eq-active');
+            voiceEqBarsEl.classList.add('hidden');
+          }
+          voiceToggleBtnEl.classList.remove('border-emerald-400/60', 'text-emerald-300', 'bg-emerald-950/45');
+          voiceIconEl.innerHTML =
+            '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+          voiceIconEl.classList.replace('text-emerald-400', 'text-slate-400');
+          showToast('VOCAL SYNTHESIS MODULE: MUTED');
+        }
+      });
+
+      // ======================================================================
+      // 3B. TACTILE RIPPLE BURSTS, SPOTLIGHT TRACKING & INTERACTIVE ELEMENTS
+      // ======================================================================
+      function attachRippleEffect(targetEl, event) {
+        if (!targetEl || targetEl.disabled) return;
+        const rect = targetEl.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+        const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+        const x = clientX ? clientX - rect.left : rect.width / 2;
+        const y = clientY ? clientY - rect.top : rect.height / 2;
+
+        const ripple = document.createElement('span');
+        ripple.className = 'doom-ripple';
+        ripple.style.width = ripple.style.height = `${size}px`;
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        targetEl.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 620);
+      }
+
+      document.addEventListener('pointerdown', (e) => {
+        const btn = e.target.closest('.doom-btn');
+        if (btn) {
+          attachRippleEffect(btn, e);
+        }
+      });
+
+      // Dynamic pointer spotlight on brushed titanium panels + Doctor Doom eye tracking
+      document.addEventListener('pointermove', (e) => {
+        const panels = document.querySelectorAll('.titanium-panel');
+        panels.forEach((panel) => {
+          const rect = panel.getBoundingClientRect();
+          panel.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+          panel.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+        });
+
+        if (doomEyesGroupEl && doomEmblemWrapperEl) {
+          const emblemRect = doomEmblemWrapperEl.getBoundingClientRect();
+          const centerX = emblemRect.left + emblemRect.width / 2;
+          const centerY = emblemRect.top + emblemRect.height / 2;
+          const dx = Math.max(-1.6, Math.min(1.6, (e.clientX - centerX) / 180));
+          const dy = Math.max(-1.2, Math.min(1.2, (e.clientY - centerY) / 180));
+          doomEyesGroupEl.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px)`;
+        }
+      });
+
+      // Interactive Doctor Doom Emblem Sovereign Ping
+      function triggerSovereignEmblemPing() {
+        doomEmblemWrapperEl.classList.add('doom-emblem-active');
+        playSynthTone(146.83, 0.16, 'sawtooth', 0.035);
+        setTimeout(() => playSynthTone(220.0, 0.22, 'triangle', 0.035), 90);
+        showToast('SOVEREIGN OVERRIDE // ALL LATVERIAN SYSTEMS NOMINAL');
+        setTimeout(() => {
+          if (!isProcessing && !voiceEnabled) {
+            doomEmblemWrapperEl.classList.remove('doom-emblem-active');
+          }
+        }, 1200);
+      }
+
+      doomEmblemWrapperEl.addEventListener('click', triggerSovereignEmblemPing);
+      doomEmblemWrapperEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          triggerSovereignEmblemPing();
+        }
+      });
+
+      // Interactive Multiverse Telemetry Cards (Click any reality card to probe it)
+      document.querySelectorAll('.telemetry-card[data-reality-prompt]').forEach((card) => {
+        card.addEventListener('click', () => {
+          const prompt = card.getAttribute('data-reality-prompt');
+          if (prompt) {
+            handleUserSubmission(prompt, false);
+          }
+        });
+      });
+
+      // ======================================================================
+      // 4. RESPONSIVE HEXAGONAL LATTICE CANVAS
+      // ======================================================================
+      function initHexCanvas() {
+        const canvas = document.getElementById('hexCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width = 0;
+        let height = 0;
+        let phase = 0;
+
+        function resizeCanvas() {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function drawHexagon(cx, cy, r, alpha) {
+          ctx.beginPath();
+          for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i;
+            const x = cx + r * Math.cos(angle);
+            const y = cy + r * Math.sin(angle);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.strokeStyle = `rgba(0, 255, 136, ${alpha})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+
+        function animateHex() {
+          ctx.clearRect(0, 0, width, height);
+          phase += 0.015;
+          const radius = 34;
+          const dx = radius * 1.5;
+          const dy = radius * Math.sqrt(3);
+
+          for (let col = -1; col < width / dx + 2; col++) {
+            for (let row = -1; row < height / dy + 2; row++) {
+              const cx = col * dx;
+              const cy = row * dy + (col % 2 === 0 ? 0 : dy / 2);
+              const wave = Math.sin(phase + col * 0.35 + row * 0.25);
+              const alpha = 0.03 + Math.max(0, wave) * 0.055;
+              drawHexagon(cx, cy, radius - 2, alpha);
+            }
+          }
+          requestAnimationFrame(animateHex);
+        }
+
+        animateHex();
+      }
+
+      // ======================================================================
+      // 5. LIVE MULTIVERSE TELEMETRY & DOOMSDAY COUNTDOWN
+      // ======================================================================
+      function initTelemetryAndCountdown() {
+        const targetDate = new Date('2026-12-18T00:00:00Z').getTime();
+        const countdownEl = document.getElementById('doomsdayCountdown');
+        const e616StatusEl = document.getElementById('e616Status');
+        const e616BarEl = document.getElementById('e616Bar');
+        const e828StatusEl = document.getElementById('e828Status');
+        const e828BarEl = document.getElementById('e828Bar');
+        const e10005StatusEl = document.getElementById('e10005Status');
+        const e10005BarEl = document.getElementById('e10005Bar');
+
+        function updateClock() {
+          const now = Date.now();
+          const diff = Math.max(0, targetDate - now);
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+          const minutes = Math.floor((diff / (1000 * 60)) % 60);
+          const seconds = Math.floor((diff / 1000) % 60);
+
+          if (countdownEl) {
+            countdownEl.textContent = `${String(days).padStart(2, '0')}d : ${String(hours).padStart(2, '0')}h : ${String(minutes).padStart(2, '0')}m : ${String(seconds).padStart(2, '0')}s`;
+          }
+        }
+
+        function jitterTelemetry() {
+          const v616 = (63.4 + Math.random() * 1.6).toFixed(1);
+          const v828 = (40.9 + Math.random() * 1.8).toFixed(1);
+          const v10005 = (53.1 + Math.random() * 1.6).toFixed(1);
+
+          if (e616StatusEl && e616BarEl) {
+            e616StatusEl.textContent = `${v616}% • FRACTURING`;
+            e616BarEl.style.width = `${v616}%`;
+          }
+          if (e828StatusEl && e828BarEl) {
+            e828StatusEl.textContent = `${v828}% • CRITICAL`;
+            e828BarEl.style.width = `${v828}%`;
+          }
+          if (e10005StatusEl && e10005BarEl) {
+            e10005StatusEl.textContent = `${v10005}% • CONVERGING`;
+            e10005BarEl.style.width = `${v10005}%`;
+          }
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+        setInterval(jitterTelemetry, 3500);
+      }
+
+      // ======================================================================
+      // 6. DIRECTIVE MODE & BREVITY SWITCHERS
+      // ======================================================================
+      brevityToggleBtnEl.addEventListener('click', () => {
+        brevityMode = brevityMode === 'STRICT' ? 'EXPANDED' : 'STRICT';
+        brevityToggleLabelEl.textContent = `DIRECTIVE BREVITY: ${brevityMode}`;
+
+        if (brevityMode === 'STRICT') {
+          brevityToggleBtnEl.classList.add('bg-emerald-950/55', 'border-emerald-400/60', 'text-emerald-300');
+          brevityToggleBtnEl.classList.remove('bg-black/50', 'border-slate-700/80', 'text-slate-300');
+        } else {
+          brevityToggleBtnEl.classList.remove('bg-emerald-950/55', 'border-emerald-400/60', 'text-emerald-300');
+          brevityToggleBtnEl.classList.add('bg-black/50', 'border-slate-700/80', 'text-slate-300');
+        }
+
+        playSynthTone(brevityMode === 'STRICT' ? 280 : 190, 0.12, 'triangle', 0.035);
+        showToast(`BREVITY PROTOCOL: ${brevityMode}`);
+      });
+
+      const modeButtons = document.querySelectorAll('.mode-btn');
+      modeButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const selectedMode = btn.getAttribute('data-directive');
+          if (!selectedMode || selectedMode === currentDirective) return;
+
+          currentDirective = selectedMode;
+          bodyEl.setAttribute('data-mode', selectedMode);
+
+          modeButtons.forEach((b) => b.classList.remove('mode-btn-active'));
+          btn.classList.add('mode-btn-active');
+
+          playSynthTone(220, 0.14, 'sawtooth', 0.035);
+          showToast(`DIRECTIVE SHIFTED: ${selectedMode}`);
+        });
+      });
+
+      // ======================================================================
+      // 7. MARKDOWN FORMATTER & MESSAGE RENDERING
+      // ======================================================================
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function formatDoomMarkdown(text) {
+        const escaped = escapeHtml(text);
+        const lines = escaped.split('\n');
+        let html = '';
+        let inList = false;
+
+        for (let line of lines) {
+          // Format inline code `...` and bold **...**
+          line = line
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+          const bulletMatch = line.match(/^\s*[-*•]\s+(.*)$/);
+          if (bulletMatch) {
+            if (!inList) {
+              html += '<ul>';
+              inList = true;
+            }
+            html += `<li>${bulletMatch[1]}</li>`;
+          } else {
+            if (inList) {
+              html += '</ul>';
+              inList = false;
+            }
+            if (line.trim() === '') {
+              html += '<div class="h-2"></div>';
+            } else {
+              html += `<p class="mb-1.5 last:mb-0">${line}</p>`;
+            }
+          }
+        }
+        if (inList) html += '</ul>';
+        return html;
+      }
+
+      function appendMessage(sender, text, metaTag = null) {
+        const wrapper = document.createElement('div');
+        wrapper.className = `msg-animate flex flex-col ${
+          sender === 'user' ? 'items-end' : 'items-start'
+        }`;
+
+        const timestamp = new Date().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        });
+
+        if (sender === 'user') {
+          wrapper.innerHTML = `
+            <div class="flex items-center gap-2 mb-1 font-mono text-[10px] text-slate-400">
+              <span>SUBJECT // INQUIRY</span>
+              <span>•</span>
+              <span>${timestamp}</span>
+            </div>
+            <div class="max-w-[88%] sm:max-w-[75%] rounded-2xl rounded-tr-sm bg-slate-800/80 border border-slate-600/50 px-4 py-3 text-sm sm:text-base text-slate-100 shadow-md">
+              ${escapeHtml(text).replace(/\n/g, '<br>')}
+            </div>
+          `;
+        } else {
+          const badge = metaTag || currentDirective;
+          const msgId = 'doom-msg-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+          wrapper.innerHTML = `
+            <div class="flex items-center gap-2 mb-1 font-mono text-[10px] text-emerald-400">
+              <span class="font-bold tracking-wider">DOOMBOT // ${escapeHtml(badge)}</span>
+              <span class="text-slate-500">•</span>
+              <span class="text-slate-400">${timestamp}</span>
+            </div>
+            <div class="group relative max-w-[94%] sm:max-w-[84%] rounded-2xl rounded-tl-sm bg-gradient-to-br from-[#0e1814] to-[#080d0b] border border-emerald-500/35 px-4 sm:px-5 py-3.5 text-sm sm:text-base text-slate-100 shadow-[0_0_25px_rgba(0,255,136,0.07)]">
+              <div id="${msgId}" class="doom-prose leading-relaxed">${formatDoomMarkdown(text)}</div>
+              <div class="mt-2.5 pt-2 border-t border-emerald-500/15 flex items-center justify-between gap-3">
+                <span class="font-mono text-[9px] text-emerald-500/70 tracking-widest">VERIFIED BY LATVERIAN SOVEREIGN CORE</span>
+                <button
+                  type="button"
+                  data-copy-target="${msgId}"
+                  class="copy-reply-btn doom-btn font-mono text-[10px] px-2 py-0.5 rounded border border-transparent hover:border-emerald-500/40 text-slate-400 hover:text-emerald-300 cursor-pointer flex items-center gap-1"
+                  title="Copy Sovereign Decree"
+                >
+                  <span>COPY</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        chatMessagesEl.appendChild(wrapper);
+        chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+
+        // Bind copy button if present
+        const copyBtn = wrapper.querySelector('.copy-reply-btn');
+        if (copyBtn) {
+          copyBtn.addEventListener('click', () => {
+            copyToClipboard(text);
+            copyBtn.innerHTML = '<span class="text-emerald-300">COPIED ✓</span>';
+            setTimeout(() => {
+              copyBtn.innerHTML = '<span>COPY</span>';
+            }, 1600);
+          });
+        }
+      }
+
+      // ======================================================================
+      // 8. SYSTEM PERSONA & GEMINI API INTEGRATION (WITH EXPONENTIAL BACKOFF)
+      // ======================================================================
+      function buildSystemInstruction() {
+        const modeDirectives = {
+          'SOVEREIGN DECREE':
+            'FOCUS — SOVEREIGN DECREE: Deliver blunt, authoritative verdicts on multiversal governance, absolute order, and Latverian supremacy.',
+          'INCURSION TACTICAL':
+            'FOCUS — INCURSION TACTICAL: Deliver cold, war-room tactical assessments of Earth-616 (Avengers, Wakanda, New Avengers), Earth-828 (Fantastic Four), and Earth-10005 (X-Men).',
+          'ARCANE & TECH FORGE':
+            'FOCUS — ARCANE & TECH FORGE: Deliver precise technical and mystical specifications combining eldritch sorcery, chronal anchors, and titanium armor engineering.',
+        };
+
+        const brevityRules =
+          brevityMode === 'STRICT'
+            ? [
+                'BREVITY LOCK — STRICT:',
+                '- Answer the user’s exact question directly in the VERY FIRST SENTENCE.',
+                '- Maximum length: 2 to 4 concise sentences OR 3 tight bullet points. Never exceed this limit.',
+                '- Zero greetings, zero theatrical monologues, zero filler openers, zero lore rambling.',
+              ].join('\n')
+            : [
+                'BREVITY MODE — EXPANDED:',
+                '- Answer the user’s exact question directly in the VERY FIRST SENTENCE.',
+                '- Provide structured tactical detail in up to 2 short paragraphs or 5 tight bullet points.',
+                '- Zero filler greetings or theatrical stalling.',
+              ].join('\n');
+
+        return [
+          'You are DOOMBOT (Latverian Sovereign Intelligence Terminal v6.16), the strategic AI built by Victor von Doom.',
+          'COMMUNICATION RULES:',
+          '- Tone: Cold, surgical, straightforward, blunt, and sovereign. Maintain Victor von Doom’s commanding authority without wasting words.',
+          '- Get straight to the point immediately. Never start with "Ah, mortal", "Listen well", or dramatic throat-clearing.',
+          '- Use **bold** only for key tactical terms or reality designations (`Earth-616`, `Earth-828`, `Earth-10005`).',
+          brevityRules,
+          modeDirectives[currentDirective] || modeDirectives['SOVEREIGN DECREE'],
+        ].join('\n');
+      }
+
+      function generateLocalFallbackResponse(userText) {
+        const lower = userText.toLowerCase();
+
+        if (lower.includes('incursion') || lower.includes('collapse') || lower.includes('status')) {
+          return '**Earth-616**, **Earth-828**, and **Earth-10005** are currently undergoing irreversible spatial convergence.\n\n- **Earth-616 (64.2%):** Fracturing along fractured heroic command lines.\n- **Earth-828 (41.8%):** Critical dimensional shear at the Baxter Nexus.\n- **Strategic Conclusion:** Only Latveria’s chronal anchors will survive the final collapse on **December 18, 2026**.';
+        }
+
+        if (lower.includes('avenger') || lower.includes('616') || lower.includes('steve') || lower.includes('thor')) {
+          return '**Earth-616’s Avengers** pose a **Moderate-Low** strategic threat due to fragmented leadership and reactive doctrine.\n\n- **Command Weakness:** Divided authority between **Sam Wilson’s** roster, **Wakanda**, and the **New Avengers**.\n- **Countermeasure:** Exploit their hesitation to make preemptive multiversal sacrifices.';
+        }
+
+        if (lower.includes('fantastic') || lower.includes('reed') || lower.includes('828')) {
+          return '**Reed Richards of Earth-828** is the primary intellectual variable, compromised by predictable sentimentality.\n\n- **Capability:** High dimensional engineering and quantum mapping.\n- **Fatal Flaw:** Richards refuses decisive authoritarian containment, ensuring his failure before **Victor von Doom**.';
+        }
+
+        if (lower.includes('x-men') || lower.includes('10005') || lower.includes('mutant') || lower.includes('magneto')) {
+          return '**Earth-10005** exhibits high omega-level energy output (**Charles Xavier**, **Magneto**) but zero multiversal defense infrastructure.\n\n- **Vulnerability:** Susceptible to chronal displacement during incursion overlap.\n- **Assessment:** High tactical damage output; negligible long-term survival probability.';
+        }
+
+        if (lower.includes('survival') || lower.includes('scan') || lower.includes('probability')) {
+          return 'Your independent survival probability across the **Multiverse Collapse** is **14.7%**.\n\n- **Primary Cause:** Unshielded exposure to chronal shear between `Earth-616` and `Earth-828`.\n- **Directive:** Pledge allegiance to **Latveria** for biometric sanctuary.';
+        }
+
+        return 'Query logged by **Latverian Sovereign Core**. State a specific target—**Incursion Status**, **Earth-616 Avengers**, **Earth-828 Fantastic Four**, or **Earth-10005**—for immediate tactical output. *(Configure a Gemini API Key in **NEURAL KEY** for unrestricted live queries on Vercel.)*';
+      }
+
+      async function callGeminiWithBackoff(userPrompt) {
+        const customKey = localStorage.getItem(STORAGE_KEY_API) || '';
+        const activeKey = customKey.trim() || apiKey;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${activeKey}`;
+
+        // Build conversational contents array (keep last 10 turns for crisp context)
+        const recentHistory = conversationHistory.slice(-10);
+        const contents = recentHistory.map((turn) => ({
+          role: turn.role,
+          parts: [{ text: turn.text }],
+        }));
+        contents.push({
+          role: 'user',
+          parts: [{ text: userPrompt }],
+        });
+
+        const payload = {
+          contents,
+          systemInstruction: {
+            parts: [{ text: buildSystemInstruction() }],
+          },
+          generationConfig: {
+            temperature: 0.65,
+            maxOutputTokens: brevityMode === 'STRICT' ? 280 : 550,
+          },
+        };
+
+        const maxRetries = 3;
+        const delays = [1000, 2000, 4000];
+
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+          try {
+            const response = await fetch(apiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP_${response.status}`);
+            }
+
+            const data = await response.json();
+            const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!replyText) {
+              throw new Error('EMPTY_CANDIDATE');
+            }
+
+            // Update conversation memory
+            conversationHistory.push({ role: 'user', text: userPrompt });
+            conversationHistory.push({ role: 'model', text: replyText });
+            connectionStatusLabelEl.textContent = 'NEURAL LINK: ACTIVE (GEMINI-3-FLASH)';
+            return replyText;
+          } catch (err) {
+            if (attempt < maxRetries) {
+              await new Promise((resolve) => setTimeout(resolve, delays[attempt]));
+            } else {
+              connectionStatusLabelEl.textContent = 'NEURAL LINK: SOVEREIGN FALLBACK';
+              return generateLocalFallbackResponse(userPrompt);
+            }
+          }
+        }
+      }
+
+      // ======================================================================
+      // 9. INTERACTIVE SURVIVAL PROBABILITY SCAN ANIMATION
+      // ======================================================================
+      function runDiagnosticScanAnimation() {
+        return new Promise((resolve) => {
+          diagnosticScanOverlayEl.classList.remove('hidden');
+          playSynthTone(110, 0.45, 'sawtooth', 0.04);
+
+          const origins = ['EARTH-616', 'EARTH-828', 'EARTH-10005', 'EARTH-616 [ANCHOR]'];
+          const threats = ['NEGLIGIBLE', 'SUB-CRITICAL', 'EXPENDABLE', 'LOW'];
+          const computedOdds = (11.2 + Math.random() * 8.4).toFixed(1) + '%';
+
+          const phases = [
+            { pct: 18, text: 'LOCKING ONTO SUBJECT BIOMETRIC & CHRONAL SIGNATURE...' },
+            { pct: 46, text: 'CROSS-REFERENCING EARTH-616 / 828 / 10005 INCURSION VECTORS...' },
+            { pct: 79, text: 'SIMULATING EXPOSURE TO DOOMSDAY SINGULARITY WAVE...' },
+            { pct: 100, text: 'AUDIT COMPLETE. TRANSMITTING VERDICT TO SOVEREIGN CORE.' },
+          ];
+
+          let step = 0;
+          scanPercentDisplayEl.textContent = '0%';
+          scanOriginValEl.textContent = 'SCANNING...';
+          scanThreatValEl.textContent = 'EVALUATING';
+          scanOddsValEl.textContent = 'COMPUTING';
+
+          const interval = setInterval(() => {
+            if (step < phases.length) {
+              const current = phases[step];
+              scanPercentDisplayEl.textContent = `${current.pct}%`;
+              scanTelemetryTextEl.textContent = current.text;
+              scanOriginValEl.textContent = origins[step % origins.length];
+              scanThreatValEl.textContent = threats[step % threats.length];
+              playSynthTone(180 + step * 55, 0.12, 'sine', 0.03);
+
+              if (current.pct === 100) {
+                scanOddsValEl.textContent = computedOdds;
+              }
+              step++;
+            } else {
+              clearInterval(interval);
+              setTimeout(() => {
+                diagnosticScanOverlayEl.classList.add('hidden');
+                resolve(computedOdds);
+              }, 450);
+            }
+          }, 520);
+        });
+      }
+
+      // ======================================================================
+      // 10. MESSAGE SUBMISSION ORCHESTRATOR
+      // ======================================================================
+      function updateInputReactorState() {
+        const len = userInputEl.value.trim().length;
+        const chargePct = Math.min(100, len * 3.2);
+        if (inputChargeBarEl) {
+          inputChargeBarEl.style.width = `${chargePct}%`;
+        }
+        if (len > 0) {
+          sendBtnEl.classList.add('transmit-charged');
+          if (clearInputBtnEl) clearInputBtnEl.classList.remove('hidden');
+        } else {
+          sendBtnEl.classList.remove('transmit-charged');
+          if (clearInputBtnEl) clearInputBtnEl.classList.add('hidden');
+        }
+      }
+
+      if (clearInputBtnEl) {
+        clearInputBtnEl.addEventListener('click', () => {
+          userInputEl.value = '';
+          userInputEl.style.height = 'auto';
+          updateInputReactorState();
+          userInputEl.focus();
+          playSynthTone(190, 0.08, 'sine', 0.025);
+        });
+      }
+
+      async function handleUserSubmission(rawPrompt, triggerScan = false) {
+        const promptText = rawPrompt.trim();
+        if (!promptText || isProcessing) return;
+
+        isProcessing = true;
+        userInputEl.value = '';
+        userInputEl.style.height = 'auto';
+        updateInputReactorState();
+
+        // Trigger high-velocity launch animation on TRANSMIT button
+        sendBtnEl.classList.remove('is-launching');
+        void sendBtnEl.offsetWidth;
+        sendBtnEl.classList.add('is-launching');
+
+        sendBtnEl.disabled = true;
+        sendBtnEl.classList.add('opacity-60', 'cursor-not-allowed');
+
+        appendMessage('user', promptText);
+        playSynthTone(240, 0.08, 'sine', 0.03);
+
+        let enrichedPrompt = promptText;
+        if (triggerScan || /survival probability|scan my survival/i.test(promptText)) {
+          const computedOdds = await runDiagnosticScanAnimation();
+          enrichedPrompt = `${promptText}\n[SYSTEM TELEMETRY: Subject's independent survival probability calculated at ${computedOdds}. State this exact percentage in the first sentence and list 2 concise bullet points explaining why.]`;
+        }
+
+        // Activate thinking state
+        typingIndicatorEl.classList.remove('hidden');
+        doomEmblemWrapperEl.classList.add('doom-emblem-active');
+        chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+
+        const reply = await callGeminiWithBackoff(enrichedPrompt);
+
+        typingIndicatorEl.classList.add('hidden');
+        isProcessing = false;
+        sendBtnEl.disabled = false;
+        sendBtnEl.classList.remove('opacity-50', 'cursor-not-allowed');
+
+        if (!voiceEnabled) {
+          doomEmblemWrapperEl.classList.remove('doom-emblem-active');
+        }
+
+        appendMessage('doombot', reply);
+        playSynthTone(165, 0.16, 'triangle', 0.035);
+        speakDoomResponse(reply);
+      }
+
+      // Form submit & Enter-to-send
+      chatFormEl.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleUserSubmission(userInputEl.value, false);
+      });
+
+      userInputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          handleUserSubmission(userInputEl.value, false);
+        }
+      });
+      // Auto-expand textarea height & energize TRANSMIT reactor button
+      userInputEl.addEventListener('input', () => {
+        userInputEl.style.height = 'auto';
+        userInputEl.style.height = Math.min(userInputEl.scrollHeight, 128) + 'px';
+        updateInputReactorState();
+      });
+
+      // Quick-action chips
+      document.querySelectorAll('.quick-prompt-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const prompt = chip.getAttribute('data-prompt');
+          const isScan = chip.id === 'scanSurvivalChip';
+          handleUserSubmission(prompt, isScan);
+        });
+      });
+
+      // Reset Terminal
+      function bootWelcomeSequence() {
+        chatMessagesEl.innerHTML = '';
+        conversationHistory = [];
+        const welcomeText =
+          '**DOOMBOT v6.16** online. State your query regarding the multiverse incursion, **Earth-616**, **Earth-828**, or **Earth-10005**—unnecessary pleasantries will be ignored.';
+        appendMessage('doombot', welcomeText, 'SOVEREIGN TERMINAL READY');
+      }
+
+      resetTerminalBtnEl.addEventListener('click', () => {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        isProcessing = false;
+        typingIndicatorEl.classList.add('hidden');
+        doomEmblemWrapperEl.classList.remove('doom-emblem-active');
+        bootWelcomeSequence();
+        playSynthTone(130, 0.18, 'sawtooth', 0.04);
+        showToast('TERMINAL MEMORY PURGED // SOVEREIGN CORE RESET');
+      });
+
+      // ======================================================================
+      // 11. NEURAL KEY VAULT MODAL HANDLERS (FOR VERCEL DEPLOYMENTS)
+      // ======================================================================
+      openKeyModalBtnEl.addEventListener('click', () => {
+        customApiKeyInputEl.value = localStorage.getItem(STORAGE_KEY_API) || '';
+        keyModalEl.classList.remove('hidden');
+      });
+
+      closeKeyModalBtnEl.addEventListener('click', () => {
+        keyModalEl.classList.add('hidden');
+      });
+
+      keyModalEl.addEventListener('click', (e) => {
+        if (e.target === keyModalEl) keyModalEl.classList.add('hidden');
+      });
+
+      saveKeyBtnEl.addEventListener('click', () => {
+        const val = customApiKeyInputEl.value.trim();
+        if (val) {
+          localStorage.setItem(STORAGE_KEY_API, val);
+          showToast('CUSTOM GEMINI KEY STORED IN LOCAL VAULT');
+        } else {
+          localStorage.removeItem(STORAGE_KEY_API);
+          showToast('USING RUNTIME DEFAULT NEURAL CREDENTIALS');
+        }
+        keyModalEl.classList.add('hidden');
+        playSynthTone(290, 0.12, 'sine', 0.035);
+      });
+
+      clearKeyBtnEl.addEventListener('click', () => {
+        localStorage.removeItem(STORAGE_KEY_API);
+        customApiKeyInputEl.value = '';
+        showToast('CUSTOM KEY PURGED FROM VAULT');
+      });
+
+      // ======================================================================
+      // 12. INITIALIZE APPLICATION ON LOAD
+      // ======================================================================
+      window.addEventListener('DOMContentLoaded', () => {
+        initHexCanvas();
+        initTelemetryAndCountdown();
+        bootWelcomeSequence();
+        // Preload speech voices if supported
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.getVoices();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
